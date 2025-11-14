@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>login - </title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body{
+            background-color: #6B3D0E;
+        }
+        form .text-box{
+            width: 350px;
+            height: 60px;
+            border-style: none;
+            border-radius: 15px;
+        }
+        form .check{
+            align-items: flex-start;
+            width: 100%;
+            flex-direction: row;
+            gap: 10px;
+            padding-left: 11px;
+        }
+        form{
+            background-color: #A87541;
+            width: 373px;
+            height: 244px;
+            border-radius: 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+            padding-top: 25px;
+        }
+        header{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        header img{
+            width: 233px;
+            height: 349px;
+        }
+        section div{
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            align-items: center;
+        }
+        .carregando{
+            width: 0;
+            height: 0;
+            overflow: hidden;
+            visibility: hidden;
+            animation: carregar 10s;
+        }
+        .carregando img{
+            width: 439px;
+            height: 439px;
+        }
+        @keyframes carregar{ 
+            0%{
+                width: 100%;
+                height: 100vh;
+                visibility: visible;
+                opacity: 1;
+            }
+            
+            100%{
+                width: 100%;
+                visibility: hidden;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="carregando">
+        <img src="img/logo-principal.png" alt="logo">
+    </div>
+    <header>
+        <img src="img/logo-entrar.png" alt="logo">
+    </header>
+    <section>
+        <div>
+            <form action="">
+                <input class="text-box" type="email" id="email" placeholder="email">
+                <input class="text-box" type="password" id="password" placeholder="password">
+                <div class="check">
+                    <input type="checkbox" id="check">
+                    <label for="check">Lembre de mim</label>
+                </div>
+            </form>
+            <button type="submit" onclick="entrar()">ENTRAR</button>
+            <a href="cadastro.html">Não tem um conta? Cadastre.</a>
+        </div>
+    </section>
+</body>
+</html>

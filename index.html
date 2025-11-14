@@ -11,13 +11,16 @@
             box-sizing: border-box;
         }
         body{
-            background-color: #6B3D0E;
+            background-color: #DAA520;
         }
         form .text-box{
             width: 350px;
             height: 60px;
             border-style: none;
             border-radius: 15px;
+            background-color: #FFF8DC;
+            padding-left: 5px;
+            font-size: 32px;
         }
         form .check{
             align-items: flex-start;
@@ -25,9 +28,17 @@
             flex-direction: row;
             gap: 10px;
             padding-left: 11px;
+            font-size: 32px;
+        }
+        .check input{
+            width: 30px;
+            height: 30px;
+            border-radius: 50px;
+            border: none;
+            background-color: #FFF8DC;
         }
         form{
-            background-color: #A87541;
+            background-color: #FFD700;
             width: 373px;
             height: 244px;
             border-radius: 25px;
@@ -43,8 +54,8 @@
             align-items: center;
         }
         header img{
-            width: 233px;
-            height: 349px;
+            width: 270px;
+            height: 270px;
         }
         section div{
             display: flex;
@@ -53,26 +64,55 @@
             align-items: center;
         }
         .carregando{
+            background-color: black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             width: 0;
             height: 0;
             overflow: hidden;
             visibility: hidden;
-            animation: carregar 10s;
+            animation: carregar 2s;
         }
         .carregando img{
             width: 439px;
             height: 439px;
+        }
+        .parte-inferior{
+            display: flex;
+            justify-content: center;
+            padding-top: 140px;
+        }
+        .parte-inferior a{
+            font-size: 24px;
+            color: black;
+            font-style: none;
+        }
+        button{
+            width: 360px;
+            height: 90px; 
+            border-radius: 25px; 
+            background-color: #FFD700;
+            border: none;
+            font-size: 48px;
         }
         @keyframes carregar{ 
             0%{
                 width: 100%;
                 height: 100vh;
                 visibility: visible;
+                opacity: 0;
+            }
+            50%{
+                width: 100%;
+                height: 100vh;
+                visibility: visible;
                 opacity: 1;
             }
-            
             100%{
                 width: 100%;
+                opacity: 0;
+                height: 100vh;
                 visibility: hidden;
             }
         }
@@ -95,8 +135,10 @@
                     <label for="check">Lembre de mim</label>
                 </div>
             </form>
-            <button type="submit" onclick="entrar()">ENTRAR</button>
-            <a href="cadastro.html">Não tem um conta? Cadastre.</a>
+            <div class="parte-inferior">
+                <button type="submit" onclick="entrar()">ENTRAR</button>
+                <a href="cadastro.html">Não tem um conta? Cadastre.</a>
+            </div>
         </div>
     </section>
 </body>

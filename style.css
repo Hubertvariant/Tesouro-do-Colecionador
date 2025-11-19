@@ -1,0 +1,742 @@
+/* =====================================================
+ CONFIGURAÇÃO GLOBAL E VARIÁVEIS
+=====================================================
+*/
+:root {
+ /* Paleta Preto e Dourado (Tema Mapa Noturno) */
+ --gold: #d4af37;
+ --gold-light: #f5d76e;
+ --gold-deep: #b8932d;
+ --ink: #1a1405; /* Fundo */
+ --parchment: #fff8e1; /* Texto principal */
+ --parchment-2: #f8eec9;
+ --shadow: rgba(245, 215, 110, .2); /* Sombra dourada */
+ --shadow-dark: rgba(0, 0, 0, .35);
+
+ /* Cores de Ação */
+ --success: #2e7d32;
+ --danger: #c62828;
+
+  /* [NOVO] Logo para o Fundo (Defina a URL da sua logo aqui) */
+  --logo-image: url(logo.png); /* <--- Troque esta linha pela sua URL! */
+}
+
+/* =====================================================
+ ANIMAÇÕES (Keyframes)
+=====================================================
+*/
+
+/* Animação de entrada principal (fade e slide) */
+@keyframes animate-slide-up {
+ from {
+  opacity: 0;
+  transform: translateY(15px);
+ }
+ to {
+  opacity: 1;
+  transform: translateY(0);
+ }
+}
+
+/* Animação de "reluzir" para a bússola */
+@keyframes pulse-glow {
+ 0%,
+ 100% {
+  filter: drop-shadow(0 0 3px var(--gold-light));
+  opacity: 0.8;
+ }
+ 50% {
+  filter: drop-shadow(0 0 6px var(--gold));
+  opacity: 1;
+ }
+}
+
+/* Animação "reluzindo" para a **LOGO** no fundo */
+@keyframes pulse-glow-chest { /* Mantive o nome do keyframe para evitar mais alterações */
+ 0%,
+ 100% {
+  opacity: 0.05;
+  filter: drop-shadow(0 0 5px var(--gold-deep)) blur(2px);
+ }
+ 50% {
+  opacity: 0.15;
+  filter: drop-shadow(0 0 20px var(--gold)) blur(0);
+ }
+}
+
+/* Animação de brilho em botões */
+@keyframes background-shine {
+ 0% {
+  background-position: -200% 0;
+ }
+ 100% {
+  background-position: 200% 0;
+ }
+}
+
+/* Animação de fade-out para o Toast */
+@keyframes fade-out {
+ to {
+  opacity: 0;
+  transform: translateX(-50%) translateY(10px);
+ }
+}
+
+
+/* =====================================================
+ RESET BÁSICO E ESTILOS GLOBAIS (Body)
+=====================================================
+*/
+*,
+*::before,
+*::after {
+ box-sizing: border-box;
+}
+
+html,
+body {
+ margin: 0;
+ padding: 0;
+}
+
+img,
+svg {
+ max-width: 100%;
+ height: auto;
+ display: block;
+}
+
+body {
+ font-family: "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+ color: var(--parchment); /* Texto claro */
+ background-color: var(--ink); /* Fundo escuro */
+ min-height: 100dvh;
+ position: relative;
+ overflow-x: hidden;
+ /* [MELHORIA] Animação de entrada na página */
+ animation: animate-slide-up 0.6s ease-out;
+}
+
+/* ANIMAÇÃO DE FUNDO: Brilho sutil (Gradientes) */
+body::before {
+ content: '';
+ position: fixed;
+ top: 0;
+ left: 0;
+ right: 0;
+ bottom: 0;
+ z-index: -2; /* Mudado para -2, -1 será a logo */
+ background:
+  radial-gradient(800px circle at 10% 20%, rgba(212, 175, 55, 0.1), transparent 40%),
+  radial-gradient(600px circle at 90% 80%, rgba(212, 175, 55, 0.08), transparent 50%);
+ opacity: 0.8;
+}
+
+/* [NOVO] ANIMAÇÃO DA LOGO RELUZINDO NO FUNDO */
+body::after {
+ content: '';
+ position: fixed;
+ z-index: -1;
+ bottom: -15%; /* Posicionado parcialmente fora da tela */
+ left: 50%;
+ transform: translateX(-50%);
+ width: 500px;
+ height: 500px;
+ max-width: 90vw;
+ background-size: contain;
+ background-repeat: no-repeat;
+ background-position: center bottom;
+ /* Usando a nova variável para a imagem da logo */
+ background-image: var(--logo-image);
+ /* Animação de "reluzir" */
+ animation: pulse-glow-chest 5s ease-in-out infinite;
+}
+
+/* =====================================================
+ LAYOUT & UTILITÁRIOS
+=====================================================
+*/
+
+/* Textura de grid (mapa) */
+.map-grid {
+ background-image:
+  radial-gradient(var(--gold-deep) 1px, transparent 0),
+  radial-gradient(var(--gold-deep) 1px, transparent 0);
+ background-position: 0 0, 10px 10px;
+ background-size: 20px 20px;
+ opacity: .1;
+ pointer-events: none;
+ position: absolute;
+ inset: 0;
+ z-index: -1;
+}
+
+.compass {
+ position: absolute;
+ right: 1rem;
+ top: 1rem;
+ width: 72px;
+ height: 72px;
+ opacity: .7;
+ filter: drop-shadow(0 2px 4px var(--shadow-dark));
+ animation: pulse-glow 4s ease-in-out infinite;
+}
+
+.wrap {
+ max-width: 1100px;
+ margin: 0 auto;
+ padding: 0 16px;
+}
+
+.grid {
+ display: grid;
+ gap: 12px
+}
+.grid.cols-2 {
+ grid-template-columns: repeat(2, minmax(0, 1fr))
+}
+.grid.cols-3 {
+ grid-template-columns: repeat(3, minmax(0, 1fr))
+}
+
+/* [NOVO] Classe para esconder labels de forma acessível */
+.visually-hidden {
+ position: absolute;
+ width: 1px;
+ height: 1px;
+ padding: 0;
+ margin: -1px;
+ overflow: hidden;
+ clip: rect(0, 0, 0, 0);
+ white-space: nowrap;
+ border: 0;
+}
+
+/* =====================================================
+ HEADER & NAVEGAÇÃO
+=====================================================
+*/
+header {
+ position: sticky;
+ top: 0;
+ z-index: 20;
+ background: linear-gradient(180deg, rgba(0, 0, 0, .5), rgba(0, 0, 0, .2));
+ -webkit-backdrop-filter: blur(8px);
+ backdrop-filter: blur(8px);
+ border-bottom: 2px solid var(--gold);
+ box-shadow: 0 4px 12px var(--shadow-dark);
+ animation: animate-slide-up .5s ease-out;
+}
+
+.brand {
+ display: flex;
+ align-items: center;
+ gap: 12px;
+ padding: 12px 0;
+ color: var(--gold-light);
+}
+
+.brand img {
+ width: 80px;
+ height: 100px
+}
+
+.brand h1 {
+ font-size: clamp(18px, 2.4vw, 24px);
+ margin: 0;
+ letter-spacing: .6px;
+ text-shadow: 0 1px 3px #000;
+}
+
+.nav {
+ display: flex;
+ gap: 8px;
+ flex-wrap: wrap;
+ padding: 0 0 12px;
+}
+
+.tab-btn {
+ -webkit-appearance: none;
+ -moz-appearance: none;
+ appearance: none;
+ border: none;
+ cursor: pointer;
+ padding: 10px 14px;
+ border-radius: 10px;
+ background: linear-gradient(180deg, var(--gold-light), var(--gold));
+ color: #281e06;
+ font-weight: 600;
+ box-shadow: 0 2px 0 #845f12, inset 0 0 0 1px #fff8;
+ transition: all .15s ease;
+ position: relative;
+ overflow: hidden;
+}
+
+/* Animação de brilho no hover */
+.tab-btn::before {
+ content: '';
+ position: absolute;
+ top: 0;
+ left: -100%;
+ width: 100%;
+ height: 100%;
+ background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+ transition: left 0.4s ease;
+}
+
+.tab-btn:hover::before {
+ left: 100%;
+}
+
+.tab-btn:hover {
+ transform: translateY(-2px);
+ box-shadow: 0 4px 8px var(--shadow), 0 2px 0 #845f12, inset 0 0 0 1px #fff8;
+}
+
+.tab-btn.active {
+ outline: 2px solid var(--gold);
+ box-shadow: 0 0 0 2px #0003, inset 0 0 10px var(--gold-deep);
+ transform: translateY(1px);
+}
+
+/* [MELHORIA] Foco visível para acessibilidade */
+.tab-btn:focus-visible {
+ outline: 2px solid var(--gold-light);
+ outline-offset: 3px;
+ box-shadow: 0 0 10px var(--shadow);
+}
+
+
+/* =====================================================
+ CONTEÚDO PRINCIPAL (PAINÉIS & CARDS)
+=====================================================
+*/
+main {
+ position: relative;
+ /* Animação de entrada com delay */
+ animation: animate-slide-up .7s ease-out .1s backwards;
+}
+
+.panel {
+ display: none;
+ animation: animate-slide-up .3s ease;
+ background: rgba(0, 0, 0, 0.2);
+ border: 2px solid var(--gold-deep);
+ border-radius: 16px;
+ box-shadow: 0 6px 20px var(--shadow-dark);
+ margin: 16px 0;
+ padding: 16px;
+}
+.panel.active {
+ display: block
+}
+
+/* [MELHORIA] Estilizando o h2 que substituímos */
+h2 {
+ display: flex;
+ align-items: center;
+ gap: 10px;
+ font-weight: 700;
+ color: var(--gold-light);
+ margin: 6px 0 12px;
+ border-bottom: 1px solid var(--gold-deep);
+ padding-bottom: 8px;
+ font-size: 1.25rem; /* 20px */
+}
+
+.card {
+ background: linear-gradient(180deg, rgba(42, 31, 10, 0.5), rgba(26, 20, 5, 0.7));
+ border: 1px solid var(--gold-deep);
+ border-radius: 12px;
+ box-shadow: 0 2px 6px rgba(0, 0, 0, .2);
+ padding: 14px;
+ transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.card:hover {
+ transform: translateY(-4px);
+ box-shadow: 0 6px 15px var(--shadow);
+}
+
+/* [MELHORIA] Estilo para listas (removido do HTML) */
+.card ul {
+ margin: 0;
+ padding-left: 18px;
+ display: grid;
+ gap: 8px;
+}
+
+
+/* =====================================================
+ FORMULÁRIOS (Inputs, Botões)
+=====================================================
+*/
+form {
+ display: grid;
+ gap: 12px
+}
+
+label {
+ font-weight: 600;
+ color: var(--gold-light);
+ display: block; /* Garante alinhamento */
+ margin-bottom: 4px;
+}
+
+.row {
+ display: grid;
+ gap: 12px;
+ grid-template-columns: repeat(2, 1fr)
+}
+
+input,
+select,
+textarea {
+ width: 100%;
+ padding: 10px 12px;
+ border-radius: 10px;
+ border: 2px solid var(--gold-deep);
+ background: rgba(0, 0, 0, 0.2);
+ color: var(--parchment);
+ font-size: 14px;
+ box-shadow: inset 0 1px 3px #0003;
+ transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+input::placeholder,
+textarea::placeholder {
+ color: #b8932d;
+ opacity: 0.7;
+}
+
+/* [MELHORIA] Foco unificado para inputs */
+input:focus,
+select:focus,
+textarea:focus,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+ border-color: var(--gold-light);
+ box-shadow: 0 0 8px var(--shadow);
+ outline: none;
+}
+
+input[type="file"] {
+ padding: 8px
+}
+/* [MELHORIA] Estilo para o label do input[type=file] */
+label[for="item-imagem"],
+label[for="importFile"] {
+ cursor: pointer;
+}
+input[type="file"]::file-selector-button {
+ /* Estiliza o botão "Escolher arquivo" */
+ background: var(--gold-deep);
+ border: none;
+ padding: 4px 8px;
+ border-radius: 4px;
+ color: var(--parchment);
+ cursor: pointer;
+ margin-right: 8px;
+}
+
+textarea {
+ min-height: 84px;
+ resize: vertical
+}
+
+.actions {
+ display: flex;
+ gap: 10px;
+ flex-wrap: wrap;
+ align-items: center; /* Alinha botões e checkboxes */
+ margin-top: 8px; /* Espaçamento */
+}
+
+.btn {
+ -webkit-appearance: none;
+ -moz-appearance: none;
+ appearance: none;
+ border: none;
+ cursor: pointer;
+ padding: 10px 14px;
+ border-radius: 12px;
+ font-weight: 700;
+ color: #241b07;
+ background: linear-gradient(180deg, var(--gold-light), var(--gold));
+ box-shadow: 0 2px 0 #845f12, inset 0 0 0 1px #fff8;
+ transition: all .15s ease;
+}
+
+.btn:hover {
+ transform: translateY(-2px);
+ box-shadow: 0 4px 8px var(--shadow), 0 2px 0 #845f12, inset 0 0 0 1px #fff8;
+}
+
+/* [MELHORIA] Foco visível para botões */
+.btn:focus-visible {
+ outline: 2px solid var(--gold-light);
+ outline-offset: 3px;
+ box-shadow: 0 0 10px var(--shadow);
+}
+
+.btn.secondary {
+ background: linear-gradient(180deg, #444, #222);
+ color: var(--parchment);
+ border: 1px solid #555;
+ box-shadow: 0 2px 0 #111;
+}
+.btn.danger {
+ background: linear-gradient(180deg, #f6d2d0, #e49a94);
+ color: #5b0b0b
+}
+.btn.success {
+ background: linear-gradient(180deg, #d7f0d8, #a8e1ab);
+ color: #0f3e13
+}
+.btn.gold {
+ background: linear-gradient(180deg, var(--gold), var(--gold-deep));
+ color: #fff;
+ text-shadow: 0 1px 0 #0004
+}
+
+/* =====================================================
+ LISTAS DE ITENS
+=====================================================
+*/
+.list {
+ display: grid;
+ gap: 12px;
+ margin-top: 12px;
+}
+
+.item {
+ display: grid;
+ gap: 12px;
+ grid-template-columns: 96px 1fr auto;
+ align-items: center;
+ padding: 10px;
+ border: 1px solid var(--gold-deep);
+ border-radius: 12px;
+ background: rgba(42, 31, 10, 0.3);
+ transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+
+.item:hover {
+ transform: translateY(-3px) scale(1.01);
+ box-shadow: 0 4px 12px var(--shadow);
+ border-color: var(--gold);
+}
+
+.item-thumb {
+ width: 96px;
+ height: 96px;
+ border-radius: 10px;
+ overflow: hidden;
+ border: 2px solid var(--gold);
+ background: #f3e2aa;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ color: var(--ink);
+ font-size: 24px;
+}
+
+.item-thumb img {
+ width: 100%;
+ height: 100%;
+ object-fit: cover
+}
+.item-title {
+ font-weight: 800;
+ color: var(--gold-light);
+ font-size: 18px;
+}
+.item-meta {
+ font-size: 13px;
+ color: var(--parchment-2);
+ opacity: 0.9;
+}
+.item-actions {
+ display: flex;
+ gap: 8px
+}
+.fav {
+ color: var(--gold);
+ font-weight: 800;
+ text-shadow: 0 0 4px var(--gold);
+}
+
+/* =====================================================
+ TOOLBAR & RODAPÉ
+=====================================================
+*/
+.toolbar {
+ display: flex;
+ gap: 10px;
+ flex-wrap: wrap;
+ align-items: center;
+ justify-content: space-between;
+ padding: 10px;
+ border: 1px dashed var(--gold-deep);
+ border-radius: 12px;
+ background: rgba(42, 31, 10, 0.3);
+}
+
+.search {
+ flex: 1;
+ min-width: 220px
+}
+
+.pill {
+ padding: 8px 12px;
+ border-radius: 999px;
+ background: var(--ink);
+ border: 1px solid var(--gold);
+ font-weight: 600;
+ color: var(--gold-light);
+ display: inline-flex; /* [MELHORIA] para alinhar checkboxes */
+ align-items: center;
+ gap: 8px;
+}
+
+footer {
+ text-align: center;
+ color: var(--gold-deep);
+ opacity: 0.7;
+ padding: 24px 16px; /* Adicionado padding */
+}
+
+/* =====================================================
+ COMPONENTES (Tooltip, Modal, Toast)
+=====================================================
+*/
+
+/* Tooltip */
+[data-tip] {
+ position: relative
+}
+[data-tip]:hover::after {
+ content: attr(data-tip);
+ position: absolute;
+ bottom: 110%;
+ left: 50%;
+ transform: translateX(-50%); /* Centralizado */
+ background: var(--gold-light);
+ color: var(--ink);
+ padding: 6px 10px;
+ border-radius: 8px;
+ border: 1px solid var(--gold);
+ font-size: 12px;
+ font-weight: 600;
+ white-space: nowrap;
+ box-shadow: 0 2px 6px var(--shadow-dark);
+ z-index: 100;
+ animation: animate-slide-up .2s ease; /* Animação de entrada */
+}
+
+/* MODAL DE EDIÇÃO */
+#editModal {
+ background: linear-gradient(180deg, var(--ink), #2a1f0a);
+ color: var(--parchment);
+ border: 2px solid var(--gold);
+ border-radius: 16px;
+ box-shadow: 0 10px 30px var(--shadow-dark);
+ width: 90%;
+ max-width: 700px;
+ padding: 0;
+ /* Animação de entrada do modal */
+ animation: animate-slide-up .3s ease;
+}
+
+#editModal::-webkit-backdrop {
+ background: rgba(0, 0, 0, 0.6);
+ -webkit-backdrop-filter: blur(4px);
+}
+
+#editModal::backdrop {
+ background: rgba(0, 0, 0, 0.6);
+ backdrop-filter: blur(4px);
+}
+
+.modal-header {
+ padding: 16px 24px;
+ border-bottom: 1px solid var(--gold-deep);
+}
+/* [MELHORIA] h2 do modal */
+.modal-header h2 {
+ font-size: 20px;
+ margin: 0;
+ padding: 0;
+ border: none;
+ color: var(--gold-light);
+}
+
+.modal-body {
+ padding: 24px;
+}
+
+.modal-footer {
+ padding: 16px 24px;
+ border-top: 1px solid var(--gold-deep);
+ display: flex;
+ justify-content: flex-end;
+ gap: 10px;
+ background: rgba(0, 0, 0, 0.2);
+ border-bottom-left-radius: 14px;
+ border-bottom-right-radius: 14px;
+}
+
+/* TOAST (Notificação) */
+.toast {
+ position: fixed;
+ bottom: 20px;
+ left: 50%;
+ transform: translateX(-50%);
+ background: linear-gradient(180deg, var(--gold-light), var(--gold));
+ color: var(--ink);
+ padding: 12px 20px;
+ border-radius: 10px;
+ box-shadow: 0 4px 15px var(--shadow);
+ z-index: 1001;
+ font-weight: 600;
+ /* [MELHORIA] Usando a animação de entrada padrão */
+ animation: animate-slide-up .3s ease, fade-out .3s ease 2.7s forwards;
+}
+
+
+/* =====================================================
+ RESPONSIVIDADE
+=====================================================
+*/
+@media (max-width: 860px) {
+ .grid.cols-3 {
+  grid-template-columns: repeat(2, 1fr)
+ }
+}
+
+@media (max-width: 640px) {
+ .grid.cols-2,
+ .grid.cols-3 {
+  grid-template-columns: 1fr
+ }
+ .brand h1 {
+  font-size: 18px
+ }
+ .row {
+  grid-template-columns: 1fr
+ }
+ .item {
+  /* [MELHORIA] Layout de item melhor em telas pequenas */
+  grid-template-columns: 1fr;
+  text-align: center;
+ }
+ .item-thumb {
+  width: 100%;
+  height: 120px; /* Mais retangular */
+  margin: 0 auto;
+ }
+ .item-actions {
+  justify-content: center;
+ }
+}

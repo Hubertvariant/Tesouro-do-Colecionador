@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Tesouro do Colecionador</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#d4af37" />
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="map-grid" aria-hidden="true"></div>
+    <svg class="compass" viewBox="0 0 100 100" aria-hidden="true">
+        <defs>
+            <radialGradient id="g" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#fff6d1" />
+                <stop offset="100%" stop-color="#b98a2f" />
+            </radialGradient>
+        </defs>
+        <circle cx="50" cy="50" r="48" fill="url(#g)" stroke="#8b5e34" stroke-width="2" />
+        <g fill="#513a12" stroke="#2a1f0a" stroke-width="1">
+            <polygon points="50,10 56,50 50,90 44,50" />
+            <polygon points="10,50 50,56 90,50 50,44" />
+        </g>
+        <text x="50" y="16" text-anchor="middle" font-size="10" fill="#2a1f0a">N</text>
+        <text x="50" y="94" text-anchor="middle" font-size="10" fill="#2a1f0a">S</text>
+        <text x="12" y="53" text-anchor="middle" font-size="10" fill="#2a1f0a">W</text>
+        <text x="88" y="53" text-anchor="middle" font-size="10" fill="#2a1f0a">E</text>
+    </svg>
+
+    <header>
+        <div class="wrap">
+            <div class="brand">
+                <img src="logo.png" alt="">
+                <h1>Tesouro do Colecionador</h1>
+            </div>
+            <nav class="nav" role="tablist" aria-label="Navegação principal">
+                <button id="tab-inicio" class="tab-btn active" data-tab="inicio" role="tab" aria-selected="true" aria-controls="inicio">Início</button>
+                <button id="tab-colecao" class="tab-btn" data-tab="colecao" role="tab" aria-selected="false" aria-controls="colecao">Minha Coleção</button>
+                <button id="tab-desejos" class="tab-btn" data-tab="desejos" role="tab" aria-selected="false" aria-controls="desejos">Lista de Desejos</button>
+                <button id="tab-favoritos" class="tab-btn" data-tab="favoritos" role="tab" aria-selected="false" aria-controls="favoritos">Favoritos</button>
+                <button id="tab-comunidade" class="tab-btn" data-tab="comunidade" role="tab" aria-selected="false" aria-controls="comunidade">Comunidade</button>
+                <button id="tab-config" class="tab-btn" data-tab="config" role="tab" aria-selected="false" aria-controls="config">Configurações</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="wrap">
+        <section id="inicio" class="panel active" role="tabpanel" aria-labelledby="tab-inicio">
+            <div class="grid cols-2">
+                <div class="card">
+                    <h2>Bem-vindo, aventureiro!</h2>
+                    <p>Este é o seu mapa para colecionar tudo que te encanta. Adicione itens com poucos
+                        cliques, marque favoritos, mantenha sua lista de desejos e exporte seu acervo. Paleta focada no
+                        dourado para aquela vibe de ouro recém-descoberto.</p>
+                    <div class="actions">
+                        <button class="btn gold" data-tab-jump="colecao">Começar a coletar</button>
+                        <button class="btn secondary" data-tab-jump="desejos">Adicionar à lista de desejos</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <h2>Dicas rápidas</h2>
+                    <ul>
+                        <li>Use a busca para filtrar por nome, categoria ou código.</li>
+                        <li>Carregue imagens dos itens para identificar seu tesouro visualmente.</li>
+                        <li>Use “Uso desejado” para definir Exposição, Troca ou Venda.</li>
+                        <li>Marque como favorito e veja tudo em “Favoritos”.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="colecao" class="panel" role="tabpanel" aria-labelledby="tab-colecao">
+            <div class="toolbar card">
+                <label for="search" class="visually-hidden">Buscar na coleção</label> <input id="search" class="search" type="search" placeholder="Buscar por nome, categoria ou código..." />
+                <div class="actions">
+                    <button class="btn success" id="export">Exportar JSON</button>
+                    <label class="btn secondary" for="importFile" data-tip="Importe um arquivo JSON exportado">
+                        Importar JSON
+                    </label>
+                    <input id="importFile" type="file" accept="application/json" hidden />
+                    <span class="pill" id="countPill">0 itens</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Adicionar item</h2>
+                <form id="formItem">
+                    <div class="row">
+                        <div>
+                            <label for="item-nome">Nome</label>
+                            <input id="item-nome" name="nome" type="text" placeholder="Ex.: Moeda romana, HQ rara" required />
+                        </div>
+                        <div>
+                            <label for="item-categoria">Categoria</label>
+                            <input id="item-categoria" name="categoria" type="text" placeholder="Moedas, Livros, Jogos..." />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div>
+                            <label for="item-codigo">Código</label>
+                            <input id="item-codigo" name="codigo" type="text" placeholder="Seu identificador único" />
+                        </div>
+                        <div>
+                            <label for="item-valor">Valor estimado (R$)</label>
+                            <input id="item-valor" name="valor" type="number" min="0" step="0.01" placeholder="0,00" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div>
+                            <label for="item-uso">Uso desejado</label>
+                            <select id="item-uso" name="uso">
+                                <option value="">Selecione...</option>
+                                <option>Exposição</option>
+                                <option>Troca</option>
+                                <option>Venda</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="item-hora">Horário (ex.: 19:00)</label>
+                            <input id="item-hora" name="hora" type="time" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div>
+                            <label for="item-tags">Tags</label>
+                            <input id="item-tags" name="tags" type="text" placeholder="cateq, Nemi?, antigo..." />
+                        </div>
+                        <div>
+                            <label for="item-imagem">Imagem</label>
+                            <input id="item-imagem" name="imagem" type="file" accept="image/*" />
+                        </div>
+                    </div>
+                    <div>
+                        <label for="item-notas">Notas</label>
+                        <textarea id="item-notas" name="notas" placeholder="Detalhes, origem, história..."></textarea>
+                    </div>
+                    <div class="actions">
+                        <label class="btn" for="chkFavTemp" data-tip="Marcar como favorito temporariamente">
+                            <input id="chkFavTemp" type="checkbox" /> Favorito
+                        </label>
+                        <button class="btn gold" type="submit">Salvar item</button>
+                        <button class="btn secondary" type="reset">Limpar</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="list" id="listaItens"></div>
+        </section>
+
+        <section id="desejos" class="panel" role="tabpanel" aria-labelledby="tab-desejos">
+            <div class="card">
+                <h2>Adicionar à Lista de Desejos</h2>
+                <form id="formDesejo">
+                    <div class="row">
+                        <div>
+                            <label for="desejo-nome">Nome</label>
+                            <input id="desejo-nome" name="nome" type="text" placeholder="O que você quer encontrar?" required />
+                        </div>
+                        <div>
+                            <label for="desejo-codigo">Código</label>
+                            <input id="desejo-codigo" name="codigo" type="text" placeholder="Opcional" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div>
+                            <label for="desejo-categoria">Categoria</label>
+                            <input id="desejo-categoria" name="categoria" type="text" placeholder="Moedas, HQ, Jogos..." />
+                        </div>
+                        <div>
+                            <label for="desejo-prioridade">Prioridade</label>
+                            <select id="desejo-prioridade" name="prioridade">
+                                <option>Alta</option>
+                                <option>Média</option>
+                                <option>Baixa</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="actions">
+                        <button class="btn gold" type="submit">Adicionar</button>
+                        <button class="btn secondary" type="reset">Limpar</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="toolbar card">
+                <h2>Itens desejados</h2>
+                <div class="actions">
+                    <span class="pill" id="countWish">0 desejos</span>
+                </div>
+            </div>
+            <div class="list" id="listaDesejos"></div>
+        </section>
+
+        <section id="favoritos" class="panel" role="tabpanel" aria-labelledby="tab-favoritos">
+            <div class="card">
+                <h2>Seus favoritos</h2>
+                <p>Itens marcados como favoritos aparecem aqui. Desfavoritar não remove da coleção, apenas da
+                    lista de favoritos.</p>
+            </div>
+            <div class="list" id="listaFavoritos"></div>
+        </section>
+
+        <section id="comunidade" class="panel" role="tabpanel" aria-labelledby="tab-comunidade">
+            <div class="grid cols-2">
+                <div class="card">
+                    <h2>Comunicação</h2>
+                    <p>Conecte-se com outros colecionadores. Planeje encontros às 7pm, compartilhe dicas e
+                        trocas. (Área demonstrativa local)</p>
+                    <form id="formChat">
+                        <div class="row">
+                            <div>
+                                <label for="chat-autor">Seu nome</label>
+                                <input id="chat-autor" name="autor" type="text" placeholder="Como devemos te chamar?" required />
+                            </div>
+                            <div>
+                                <label for="chat-texto">Mensagem</label>
+                                <input id="chat-texto" name="texto" type="text" placeholder="Escreva algo..." required />
+                            </div>
+                        </div>
+                        <div class="actions">
+                            <button class="btn gold" type="submit">Enviar</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card">
+                    <h2>Mensagens</h2>
+                    <div id="chatList" class="list"></div>
+                </div>
+            </div>
+
+            <div class="grid cols-3">
+                <div class="card">
+                    <h2>Eventos</h2>
+                    <ul>
+                        <li>Encontro às 7pm (toda sexta) — Grupo “Cateq”</li>
+                        <li>Feira de trocas — Último sábado do mês</li>
+                        <li>Mostra “Nemi?” — Aberta a contribuições</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h2>Grupos</h2>
+                    <ul>
+                        <li>Cateq — colecionadores temáticos</li>
+                        <li>Nemi? — raridades e curiosidades</li>
+                        <li>Clássicos — moedas, selos, notas</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h2>Código do colecionador</h2>
+                    <p>Use seu <strong>código</strong> para identificar itens, facilitar trocas e manter
+                        rastreio do acervo.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="config" class="panel" role="tabpanel" aria-labelledby="tab-config">
+            <div class="grid cols-2">
+                <div class="card">
+                    <h2>Preferências</h2>
+                    <form id="formPrefs">
+                        <label class="pill" for="pref-goldMode">
+                            <input id="pref-goldMode" type="checkbox" name="goldMode" />
+                            Modo super dourado
+                        </label>
+                        <label class="pill" for="pref-compact">
+                            <input id="pref-compact" type="checkbox" name="compact" />
+                            Lista compacta
+                        </label>
+                        <div class="actions">
+                            <button class="btn gold" type="submit">Salvar preferências</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h2>Backup</h2>
+                    <div class="actions">
+                        <button class="btn success" id="backupAll">Baixar backup completo</button>
+                        <button class="btn danger" id="wipeAll">Apagar tudo (local)</button>
+                    </div>
+                    <p>Este site guarda dados no seu navegador (localStorage). O backup
+                        baixa um arquivo .json.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="wrap">
+            © 2025 Tesouro do Colecionador🏴‍☠️
+        </div>
+    </footer>
+
+    <dialog id="editModal" aria-labelledby="modal-title">
+        <div class="modal-header">
+            <h2 id="modal-title">Editar Tesouro</h2>
+        </div>
+        <div class="modal-body">
+            <form id="formEdit">
+                <input type="hidden" name="id" />
+                <div class="row">
+                    <div>
+                        <label for="edit-nome">Nome</label>
+                        <input id="edit-nome" name="nome" type="text" placeholder="Ex.: Moeda romana, HQ rara" required />
+                    </div>
+                    <div>
+                        <label for="edit-categoria">Categoria</label>
+                        <input id="edit-categoria" name="categoria" type="text" placeholder="Moedas, Livros, Jogos..." />
+                    </div>
+                </div>
+                <div class="row">
+                    <div>
+                        <label for="edit-codigo">Código</label>
+                        <input id="edit-codigo" name="codigo" type="text" placeholder="Seu identificador único" />
+                    </div>
+                    <div>
+                        <label for="edit-valor">Valor estimado (R$)</label>
+                        <input id="edit-valor" name="valor" type="number" min="0" step="0.01" placeholder="0,00" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div>
+                        <label for="edit-uso">Uso desejado</label>
+                        <select id="edit-uso" name="uso">
+                            <option value="">Selecione...</option>
+                            <option>Exposição</option>
+                            <option>Troca</option>
+                            <option>Venda</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="edit-hora">Horário (ex.: 19:00)</label>
+                        <input id="edit-hora" name="hora" type="time" />
+                    </div>
+                </div>
+                <div>
+                    <label for="edit-tags">Tags</label>
+                    <input id="edit-tags" name="tags" type="text" placeholder="cateq, Nemi?, antigo..." />
+                </div>
+                <div>
+                    <label for="edit-notas">Notas</label>
+                    <textarea id="edit-notas" name="notas" placeholder="Detalhes, origem, história..."></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn secondary" type="button" id="btnCancelEdit">Cancelar</button>
+            <button class="btn gold" type="submit" form="formEdit">Salvar Alterações</button>
+        </div>
+    </dialog>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
